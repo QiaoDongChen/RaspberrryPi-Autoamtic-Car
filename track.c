@@ -1,16 +1,17 @@
 #include<stdio.h>
 #include<wiringPi.h>
 
-#include"FollowLine.h"
+#include"turnTowSide.h"
 
 #define LeftTCRPin 25
 #define MidTCRPin 24
 #define RightTCRPin 23
 
-#define SPEED 22
-#define DELAY 20
+#define SPEED 30+10
+#define DELAY 20+3
 
 int status = 0;
+
 void straight(){
     // status = 0;
     t_up(SPEED ,DELAY);
@@ -19,6 +20,7 @@ void straight(){
 
 void turnLeft(){
     status = 1;
+    // t_down(SPEED/2,10);
     delay(30);
     t_stop(15);
     turn_left(SPEED+5, DELAY);
@@ -27,6 +29,7 @@ void turnLeft(){
 
 void turnRight(){
     status = 2;
+    // t_down(SPEED/2,10);
     delay(30);
     t_stop(15);
     turn_right(SPEED+5, DELAY);
@@ -59,20 +62,37 @@ int main()
         int MID = digitalRead(MidTCRPin);
 
         if(MID&&!LFT&&!RIT) straight();
-        else if(MID&&!LFT&&RIT) turnRight();
-        else if(MID&&LFT&&!RIT) turnLeft();
-        else if (MID&&LFT&&RIT);
-        else if(!MID&&LFT&&RIT);
+        else if(MID&&!LFT&&RIT) {
+            if(MID&&!LFT&&RIT){
+                turnRight();
+            }
+        }
+        else if(MID&&LFT&&!RIT){
+            turnLeft();
+        } 
+        else if (MID&&LFT&&RIT){
+            delay(10);
+            if (MID&&LFT&&RIT){
+                if (status==1) turnLeft();
+                else if(status==2) turnRight();
+            }
+        }
+        else if(!MID&&LFT&&RIT){
+            // delay(10);
+            if(!MID&&LFT&&RIT){
+                if (status==1) turnLeft();
+                else if(status==2) turnRight();
+            }
+        }
         else if(!MID&&LFT&&!RIT) turnLeft();
         else if(!MID&&!LFT&&RIT) turnRight();
         else {
-            if (status==1) turnLeft();
-            else if(status==2) turnRight();  
+            // delay(10);
+            if(!MID&&!LFT&&!RIT){
+                if (status==1) turnLeft();
+                else if(status==2) turnRight(); 
+            } 
         }
-
-
-
-
     }
     
     return 0;
